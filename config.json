@@ -1,0 +1,34 @@
+{
+  "server": {
+    "port": 8081
+  },
+  "logger": {
+    "INFO": {
+      "format": ["DATE", "TYPE", "MSG"],
+      "color": {
+        "DATE": "bold",
+        "TYPE": "blue.bold.bgBlack",
+        "MSG": "bold"
+      },
+      "type": "INFO"
+    },
+    "ERROR": {
+      "format": ["DATE", "TYPE", "MSG"],
+      "color": {
+        "DATE": "bold",
+        "TYPE": "red.bold.bgBlack",
+        "MSG": "bold"
+      },
+      "type": "CRITICAL"
+    },
+    "WARNING": {
+      "format": ["DATE", "TYPE", "MSG"],
+      "color": {
+        "DATE": "bold",
+        "TYPE": "yellow.bold.bgBlack",
+        "MSG": "bold"
+      },
+      "type": "WARNING"
+    }
+  }
+}
