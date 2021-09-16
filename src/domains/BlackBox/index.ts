@@ -44,13 +44,20 @@ export default class BlackBox {
 
         this.server
             .listen(port, () => {
-                this.rootModule.logModule?.emitter.emit(
-                    LogEvents.LogInfo,
-                    `Сервер слушает порт ${port}`
-                );
+                this.log(LogEvents.LogInfo, `Сервер слушает порт ${port}`);
             })
             .on("error", (error: Error) => {
                 throw new Error(error.message);
             });
+    }
+
+    /**
+     * Логирование событий
+     * @param type
+     * @param msg
+     * @private
+     */
+    public log(type: LogEvents, msg: string) {
+        this.rootModule.logModule?.emitter.emit(type, msg);
     }
 }

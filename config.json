@@ -2,6 +2,17 @@
   "server": {
     "port": 8081
   },
+  "DB": {
+    "mongo": {
+      "use": true,
+      "host": "localhost",
+      "port": 27017,
+      "user_name": "admin",
+      "password": "neoBorg666",
+      "db_name": "blackBox",
+      "string_options": "?authSource=admin"
+    }
+  },
   "logger": {
     "INFO": {
       "format": ["DATE", "TYPE", "MSG"],
