@@ -79,7 +79,12 @@ export default class BlackBox {
     public rabbitConnect(isReconect: boolean = false) {
         this.rootModule.rabbitModule?.emitter.emit(
             RabbitEvents.CreateConnect,
-            (isOk: boolean, errorMsg: string, connection: amqp.Connection) => {
+            (
+                isOk: boolean,
+                errorMsg: string,
+                connection: amqp.Connection,
+                channel: amqp.Channel
+            ) => {
                 if (isOk) {
                     this.log(LogEvents.LogInfo, "Подключились к RabbitMQ");
 
@@ -101,13 +106,23 @@ export default class BlackBox {
                             LogEvents.LogWarning,
                             "Rabbit connection is closing"
                         );
-
-                        // isReconect &&
-                        //     setTimeout(
-                        //         this.rabbitConnect.bind(this, isReconect),
-                        //         1000
-                        //     );
                     });
+
+                    /**
+                     * Слушатели событий канала
+                     */
+                    if (channel) {
+                        channel.on("error", (error: Error) => {
+                            this.log(LogEvents.LogError, error.message);
+                        });
+
+                        channel.on("close", () => {
+                            this.log(
+                                LogEvents.LogWarning,
+                                "Rabbit channel is closing"
+                            );
+                        });
+                    }
                 } else {
                     throw new Error(errorMsg);
                 }

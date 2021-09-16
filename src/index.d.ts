@@ -30,7 +30,6 @@ export namespace blackbox {
         receive_queue_name: string,
         receive_exchange: string,
         receive_routing_key: string,
-        receive_bind_xmttl: number,
         send_exchange: string,
         send_exchange_type: string,
         send_routing_key: string,
@@ -39,9 +38,10 @@ export namespace blackbox {
             receive: {
                 durable: boolean,
                 autoDelete: boolean,
-                consume: {
-                    noAck: boolean,
-                },
+                messageTtl: number
+            },
+            consume: {
+                noAck: boolean,
             },
             send: {
                 durable: boolean,

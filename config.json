@@ -5,21 +5,21 @@
   "rabbitMQ": {
     "use": true,
     "url": "amqp://root:password@172.23.16.51:5672",
-    "receive_queue_name": "q_DE",
+    "receive_queue_name": "q_DispEvents",
     "receive_exchange": "ex_DispEvents",
     "receive_routing_key": "k_DispEvents",
-    "receive_bind_xmttl": 600000,
     "send_exchange": "ex_PreparedUserEvents",
     "send_exchange_type": "fanout",
     "send_routing_key": "k_PreparedUserEvents",
     "prefetch": 10,
     "channel": {
       "receive": {
-        "durable": false,
-        "autoDelete": true,
-        "consume": {
-          "noAck": false
-        }
+        "durable": true,
+        "autoDelete": false,
+        "messageTtl": 600000
+      },
+      "consume": {
+        "noAck": false
       },
       "send": {
         "durable": true

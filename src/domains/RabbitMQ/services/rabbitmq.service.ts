@@ -2,16 +2,16 @@ import { blackbox } from "../../../index.d";
 import amqp from "amqplib/callback_api";
 
 const defaultConfig = {
-    receive_bind_xmttl: 60000,
     send_exchange_type: "fanout",
     prefetch: 10,
     channel: {
         receive: {
             durable: false,
             autoDelete: true,
-            consume: {
-                noAck: false,
-            },
+            messageTtl: 600000,
+        },
+        consume: {
+            noAck: false,
         },
         send: {
             durable: true,
@@ -37,17 +37,18 @@ export default class RabbitmqService {
         callback: (
             isOk: boolean,
             errorMsg: string,
-            connection: amqp.Connection | null
+            connection: amqp.Connection | null,
+            channel: amqp.Channel | null
         ) => void
     ) {
         amqp.connect(this.config.url, (error: Error, connection) => {
             if (error) {
-                callback(false, error.message, null);
+                callback(false, error.message, null, null);
 
-                setTimeout(this.connectRabbit.bind(this, callback), 1000);
+                return;
             }
 
-            callback(true, "", connection);
+            callback(true, "", connection, null);
 
             /** ==== */
 
@@ -59,14 +60,22 @@ export default class RabbitmqService {
             /**
              * Создание канала получения
              */
-            this.receiveMsg();
+            this.receiveMsg(callback);
         });
     }
 
-    private receiveMsg() {
+    private receiveMsg(
+        callback: (
+            isOk: boolean,
+            errorMsg: string,
+            connection: amqp.Connection | null,
+            channel: amqp.Channel | null
+        ) => void
+    ) {
         this.connect?.createChannel((error, ch) => {
             if (this.closeOnErr(error)) return;
 
+            callback(true, "", this.connect || null, ch);
             /**
              * Процесс обработки получения сообщений
              * @param msg
@@ -82,17 +91,6 @@ export default class RabbitmqService {
                 });
             };
 
-            /**
-             * Слушатели событий канала
-             */
-            ch.on("error", (error: Error) => {
-                console.log("ch err", error);
-            });
-
-            ch.on("close", () => {
-                console.log("ch close");
-            });
-
             /** ==== */
 
             ch.prefetch(this.config?.prefetch || defaultConfig.prefetch);
@@ -106,8 +104,8 @@ export default class RabbitmqService {
                     ch.consume(
                         this.config.receive_queue_name,
                         processMsg,
-                        this.config.channel.receive.consume ||
-                            defaultConfig.channel.receive.consume
+                        this.config.channel.consume ||
+                            defaultConfig.channel.consume
                     );
                 }
             );
@@ -118,15 +116,7 @@ export default class RabbitmqService {
             ch.bindQueue(
                 this.config.receive_queue_name,
                 this.config.receive_exchange || "",
-                this.config.receive_routing_key || "",
-                {
-                    "x-message-ttl":
-                        Number(this.config.receive_bind_xmttl) ||
-                        defaultConfig.receive_bind_xmttl,
-                }
-                // (error) => {
-                //     console.log("ch bind", error);
-                // }
+                this.config.receive_routing_key || ""
             );
         });
 
@@ -135,9 +125,8 @@ export default class RabbitmqService {
          * @param msg
          * @param cb
          */
-        function work(_msg: any, cb: (ok: boolean) => void) {
-            console.log(_msg);
-
+        function work(msg: amqp.Message, cb: (ok: boolean) => void) {
+            console.log(msg.content.toString());
             cb(true);
         }
     }
