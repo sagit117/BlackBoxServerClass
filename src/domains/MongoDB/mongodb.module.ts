@@ -1,5 +1,6 @@
 import MongodbEmitter from "./emitters/mongodb.emitter";
 import MongodbService from "./services/mongodb.service";
+import BaseModule from "../BaseModule";
 
 /**
  * События для слушателя
@@ -13,26 +14,21 @@ export enum MongoEvents {
  * @param emitter
  * @param service
  */
-export default class MongodbModule {
-    public emitter: MongodbEmitter;
-    private service: MongodbService;
-
+export default class MongodbModule extends BaseModule<
+    MongodbEmitter,
+    MongodbService
+> {
     constructor(emitter: MongodbEmitter, service: MongodbService) {
+        super(emitter, service);
+
         console.log("created MongodbModule");
-
-        this.emitter = emitter;
-        this.service = service;
-
-        this.addListeners();
     }
 
     /**
      * Создаем слушатели mongo
      * @private
      */
-    private addListeners() {
-        console.log("created listeners for mongo");
-
+    protected addListeners() {
         this.emitter.addListeners(
             MongoEvents.CreateConnect,
             this.service.connect
