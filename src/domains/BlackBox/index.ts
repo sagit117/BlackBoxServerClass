@@ -3,8 +3,9 @@ import { blackbox } from "../../index.d";
 import RootModule from "../RootModule";
 import { LogEvents } from "../Log/log.module";
 import { MongoEvents } from "../MongoDB/mongodb.module";
-import { Mongoose } from "mongoose";
+import { Error, Mongoose } from "mongoose";
 import { RabbitEvents } from "../RabbitMQ/rabbitmq.module";
+import amqp from "amqplib/callback_api";
 
 /**
  * Конфиг по умолчанию
@@ -75,12 +76,38 @@ export default class BlackBox {
     /**
      * Подключение к rabbitMQ
      */
-    public rabbitConnect() {
-        this.rootModule.mongoModule?.emitter.emit(
+    public rabbitConnect(isReconect: boolean = false) {
+        this.rootModule.rabbitModule?.emitter.emit(
             RabbitEvents.CreateConnect,
-            (isOk: boolean, errorMsg: string) => {
+            (isOk: boolean, errorMsg: string, connection: amqp.Connection) => {
                 if (isOk) {
                     this.log(LogEvents.LogInfo, "Подключились к RabbitMQ");
+
+                    /**
+                     * Слушатели событий соединения
+                     */
+                    connection.on("error", (error: Error) => {
+                        this.log(LogEvents.LogError, error.message);
+
+                        isReconect &&
+                            setTimeout(
+                                this.rabbitConnect.bind(this, isReconect),
+                                1000
+                            );
+                    });
+
+                    connection.on("close", () => {
+                        this.log(
+                            LogEvents.LogWarning,
+                            "Rabbit connection is closing"
+                        );
+
+                        // isReconect &&
+                        //     setTimeout(
+                        //         this.rabbitConnect.bind(this, isReconect),
+                        //         1000
+                        //     );
+                    });
                 } else {
                     throw new Error(errorMsg);
                 }

@@ -5,8 +5,8 @@
   "rabbitMQ": {
     "use": true,
     "url": "amqp://root:password@172.23.16.51:5672",
-    "receive_queue_name": "q_UserEvents",
-    "receive_exchange":" ex_DispEvents",
+    "receive_queue_name": "q_DE",
+    "receive_exchange": "ex_DispEvents",
     "receive_routing_key": "k_DispEvents",
     "receive_bind_xmttl": 600000,
     "send_exchange": "ex_PreparedUserEvents",

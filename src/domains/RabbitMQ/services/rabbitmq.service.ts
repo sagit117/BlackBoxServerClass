@@ -1,6 +1,5 @@
 import { blackbox } from "../../../index.d";
 import amqp from "amqplib/callback_api";
-import { Error } from "mongoose";
 
 const defaultConfig = {
     receive_bind_xmttl: 60000,
@@ -34,30 +33,21 @@ export default class RabbitmqService {
      * Соединение с rabbitMQ
      * @param callback
      */
-    public connectRabbit(callback: (isOk: boolean, errorMsg: string) => void) {
+    public connectRabbit(
+        callback: (
+            isOk: boolean,
+            errorMsg: string,
+            connection: amqp.Connection | null
+        ) => void
+    ) {
         amqp.connect(this.config.url, (error: Error, connection) => {
             if (error) {
-                callback(false, error.message);
+                callback(false, error.message, null);
 
                 setTimeout(this.connectRabbit.bind(this, callback), 1000);
             }
 
-            callback(true, "");
-
-            // /**
-            //  * Слушатели событий соединения
-            //  */
-            // connection.on("error", (error: Error) => {
-            //     if (error.message !== "Connection closing") {
-            //         callback(false, error.message);
-            //     }
-            //
-            //     setTimeout(this.connectRabbit.bind(this, callback), 1000);
-            // });
-            //
-            // connection.on("close", () => {
-            //     // setTimeout(this.connectRabbit, 1000);
-            // });
+            callback(true, "", connection);
 
             /** ==== */
 
@@ -92,16 +82,16 @@ export default class RabbitmqService {
                 });
             };
 
-            // /**
-            //  * Слушатели событий канала
-            //  */
-            // ch.on("error", (error: Error) => {
-            //     //
-            // });
-            //
-            // ch.on("close", () => {
-            //     //
-            // });
+            /**
+             * Слушатели событий канала
+             */
+            ch.on("error", (error: Error) => {
+                console.log("ch err", error);
+            });
+
+            ch.on("close", () => {
+                console.log("ch close");
+            });
 
             /** ==== */
 
@@ -134,6 +124,9 @@ export default class RabbitmqService {
                         Number(this.config.receive_bind_xmttl) ||
                         defaultConfig.receive_bind_xmttl,
                 }
+                // (error) => {
+                //     console.log("ch bind", error);
+                // }
             );
         });
 
@@ -143,10 +136,7 @@ export default class RabbitmqService {
          * @param cb
          */
         function work(_msg: any, cb: (ok: boolean) => void) {
-            /**
-             * Локальное событие с объектом статуса
-             */
-            // App.emit("getMessageRabbit", msg);
+            console.log(_msg);
 
             cb(true);
         }
@@ -157,9 +147,9 @@ export default class RabbitmqService {
      * @param error
      */
     private closeOnErr(error: Error) {
-        if (!error || !this.connect) return false;
+        if (!error) return false;
 
-        this.connect.close();
+        this.connect?.close();
 
         return true;
     }
