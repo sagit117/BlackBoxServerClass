@@ -25,8 +25,7 @@ export default class MongodbModule extends BaseModule<
     }
 
     /**
-     * Создаем слушатели mongo
-     * @private
+     * Создаем слушатели
      */
     protected addListeners() {
         this.emitter.addListeners(

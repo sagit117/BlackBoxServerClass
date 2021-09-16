@@ -32,26 +32,32 @@ export default class RabbitmqService {
 
     /**
      * Соединение с rabbitMQ
+     * @param callback
      */
-    public connectRabbit() {
+    public connectRabbit(callback: (isOk: boolean, errorMsg: string) => void) {
         amqp.connect(this.config.url, (error: Error, connection) => {
             if (error) {
-                // setTimeout(this.connectRabbit, 1000);
+                callback(false, error.message);
+
+                setTimeout(this.connectRabbit.bind(this, callback), 1000);
             }
 
-            /**
-             * Слушатели событий соединения
-             */
-            connection.on("error", (err: Error) => {
-                if (err.message !== "Connection closing") {
-                }
+            callback(true, "");
 
-                // setTimeout(this.connectRabbit, 1000);
-            });
-
-            connection.on("close", () => {
-                // setTimeout(this.connectRabbit, 1000);
-            });
+            // /**
+            //  * Слушатели событий соединения
+            //  */
+            // connection.on("error", (error: Error) => {
+            //     if (error.message !== "Connection closing") {
+            //         callback(false, error.message);
+            //     }
+            //
+            //     setTimeout(this.connectRabbit.bind(this, callback), 1000);
+            // });
+            //
+            // connection.on("close", () => {
+            //     // setTimeout(this.connectRabbit, 1000);
+            // });
 
             /** ==== */
 
@@ -86,16 +92,16 @@ export default class RabbitmqService {
                 });
             };
 
-            /**
-             * Слушатели событий канала
-             */
-            ch.on("error", (error: Error) => {
-                //
-            });
-
-            ch.on("close", () => {
-                //
-            });
+            // /**
+            //  * Слушатели событий канала
+            //  */
+            // ch.on("error", (error: Error) => {
+            //     //
+            // });
+            //
+            // ch.on("close", () => {
+            //     //
+            // });
 
             /** ==== */
 
@@ -136,7 +142,7 @@ export default class RabbitmqService {
          * @param msg
          * @param cb
          */
-        function work(msg: any, cb: (ok: boolean) => void) {
+        function work(_msg: any, cb: (ok: boolean) => void) {
             /**
              * Локальное событие с объектом статуса
              */
@@ -168,16 +174,16 @@ export default class RabbitmqService {
 
             if (!ch) return;
 
-            /**
-             * Слушатели событий канала
-             */
-            ch.on("error", (error: Error) => {
-                //
-            });
-
-            ch.on("close", () => {
-                //
-            });
+            // /**
+            //  * Слушатели событий канала
+            //  */
+            // ch.on("error", (error: Error) => {
+            //     //
+            // });
+            //
+            // ch.on("close", () => {
+            //     //
+            // });
 
             /** ==== */
 

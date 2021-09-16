@@ -6,6 +6,9 @@ import LogService from "./Log/services/log.service";
 import MongodbService from "./MongoDB/services/mongodb.service";
 import MongodbEmitter from "./MongoDB/emitters/mongodb.emitter";
 import MongodbModule from "./MongoDB/mongodb.module";
+import RabbitmqService from "./RabbitMQ/services/rabbitmq.service";
+import RabbitmqEmitter from "./RabbitMQ/emitters/rabbitmq.emitter";
+import RabbitmqModule from "./RabbitMQ/rabbitmq.module";
 
 /**
  * Активирует все модули
@@ -13,6 +16,7 @@ import MongodbModule from "./MongoDB/mongodb.module";
 export default class RootModule {
     public readonly logModule: LogModule | undefined;
     public readonly mongoModule: MongodbModule | undefined;
+    public readonly rabbitModule: RabbitmqModule | undefined;
 
     constructor(config: blackbox.IConfig) {
         console.log("created RootModule");
@@ -38,6 +42,19 @@ export default class RootModule {
             const mongoEmitter = new MongodbEmitter(mongoService);
 
             this.mongoModule = new MongodbModule(mongoEmitter, mongoService);
+        }
+
+        /**
+         * Подключение к rabbit
+         */
+        if (config.rabbitMQ?.use) {
+            const rabbitService = new RabbitmqService(config.rabbitMQ);
+            const rabbitEmitter = new RabbitmqEmitter(rabbitService);
+
+            this.rabbitModule = new RabbitmqModule(
+                rabbitEmitter,
+                rabbitService
+            );
         }
     }
 }

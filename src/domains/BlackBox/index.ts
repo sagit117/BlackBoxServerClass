@@ -4,6 +4,7 @@ import RootModule from "../RootModule";
 import { LogEvents } from "../Log/log.module";
 import { MongoEvents } from "../MongoDB/mongodb.module";
 import { Mongoose } from "mongoose";
+import { RabbitEvents } from "../RabbitMQ/rabbitmq.module";
 
 /**
  * Конфиг по умолчанию
@@ -59,11 +60,29 @@ export default class BlackBox {
             MongoEvents.CreateConnect,
             (conn: typeof Mongoose) => {
                 if (conn) {
-                    this.log(LogEvents.LogInfo, "Подключились к Mongo DB");
+                    this.log(LogEvents.LogInfo, "Подключились к MongoDB");
                 } else {
                     throw new Error(
-                        "Произошла ошибка при подключение к Mongo DB"
+                        "Произошла ошибка при подключение к MongoDB"
                     );
+                }
+            }
+        );
+
+        return this;
+    }
+
+    /**
+     * Подключение к rabbitMQ
+     */
+    public rabbitConnect() {
+        this.rootModule.mongoModule?.emitter.emit(
+            RabbitEvents.CreateConnect,
+            (isOk: boolean, errorMsg: string) => {
+                if (isOk) {
+                    this.log(LogEvents.LogInfo, "Подключились к RabbitMQ");
+                } else {
+                    throw new Error(errorMsg);
                 }
             }
         );

@@ -3,8 +3,6 @@ export default class BaseModule<Emitter, Service> {
     protected service: Service;
 
     constructor(emitter: Emitter, service: Service) {
-        console.log("created MongodbModule");
-
         this.emitter = emitter;
         this.service = service;
 
