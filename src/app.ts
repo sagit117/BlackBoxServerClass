@@ -7,10 +7,10 @@ import RootModule from "./domains/RootModule";
 import { LogEvents } from "./domains/Log/log.module";
 
 /**
- * Создаем сервер
+ * Создаем приложение
  * @param pathToConfig
  */
-export function createServer(pathToConfig: string) {
+export function createApp(pathToConfig: string) {
     /**
      * Читаем настройки
      */
@@ -49,7 +49,6 @@ export function createServer(pathToConfig: string) {
      * Обработчики выхода
      */
     const exits = ["exit", "SIGTERM", "SIGINT", "SIGHUP", "SIGQUIT"];
-
     exits.forEach((event) => {
         process.on(event, (code) => {
             rootModule.logModule?.emitter.emit(
@@ -61,6 +60,9 @@ export function createServer(pathToConfig: string) {
         });
     });
 
+    /**
+     * Создаем класс приложения
+     */
     const BlackBoxServer = new BlackBox(Server, config.server, rootModule);
 
     return BlackBoxServer;

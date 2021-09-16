@@ -33,31 +33,42 @@ export default class BlackBox {
         this.server = server;
         this.config = config;
         this.rootModule = rootModule;
-
-        this.listenedPort(this.config?.port || defaultConfig.port);
     }
 
     /**
      * Слушаем сервер на порту
-     * @private
      */
-    private listenedPort(port: number) {
-        console.log("trying to listen to the port:", port);
-
+    public listenedPort() {
+        const port = this.config?.port || defaultConfig.port;
         this.server
             .listen(port, () => {
                 this.log(LogEvents.LogInfo, `Сервер слушает порт ${port}`);
-
-                this.rootModule.mongoModule?.emitter.emit(
-                    MongoEvents.CreateConnect,
-                    (conn: Promise<typeof Mongoose>) => {
-                        console.log(conn);
-                    }
-                );
             })
             .on("error", (error: Error) => {
                 throw new Error(error.message);
             });
+
+        return this;
+    }
+
+    /**
+     * Подключаемся к mongodb
+     */
+    public mongoConnect() {
+        this.rootModule.mongoModule?.emitter.emit(
+            MongoEvents.CreateConnect,
+            (conn: typeof Mongoose) => {
+                if (conn) {
+                    this.log(LogEvents.LogInfo, "Подключились к Mongo DB");
+                } else {
+                    throw new Error(
+                        "Произошла ошибка при подключение к Mongo DB"
+                    );
+                }
+            }
+        );
+
+        return this;
     }
 
     /**
