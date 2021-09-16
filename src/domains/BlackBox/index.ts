@@ -2,6 +2,8 @@ import * as http from "http";
 import { blackbox } from "../../index.d";
 import RootModule from "../RootModule";
 import { LogEvents } from "../Log/log.module";
+import { MongoEvents } from "../MongoDB/mongodb.module";
+import { Mongoose } from "mongoose";
 
 /**
  * Конфиг по умолчанию
@@ -45,6 +47,13 @@ export default class BlackBox {
         this.server
             .listen(port, () => {
                 this.log(LogEvents.LogInfo, `Сервер слушает порт ${port}`);
+
+                this.rootModule.mongoModule?.emitter.emit(
+                    MongoEvents.CreateConnect,
+                    (conn: Promise<typeof Mongoose>) => {
+                        console.log(conn);
+                    }
+                );
             })
             .on("error", (error: Error) => {
                 throw new Error(error.message);

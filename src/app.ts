@@ -31,8 +31,34 @@ export function createServer(pathToConfig: string) {
      * Обработчики неизвестных ошибок
      */
     process.on("uncaughtException", (error) => {
-        rootModule.logModule?.emitter?.emit(LogEvents.LogError, error.message);
+        rootModule.logModule?.emitter?.emit(
+            LogEvents.LogError,
+            error.message + " " + error.stack
+        );
         process.exit(1);
+    });
+
+    /**
+     * Обработчик ошибок в promises
+     */
+    process.on("unhandledRejection", (reason, _promise) => {
+        rootModule.logModule?.emitter?.emit(LogEvents.LogError, reason);
+    });
+
+    /**
+     * Обработчики выхода
+     */
+    const exits = ["exit", "SIGTERM", "SIGINT", "SIGHUP", "SIGQUIT"];
+
+    exits.forEach((event) => {
+        process.on(event, (code) => {
+            rootModule.logModule?.emitter.emit(
+                LogEvents.LogInfo,
+                `server остановлен по коду ${code}`
+            );
+
+            process.exit(code);
+        });
     });
 
     const BlackBoxServer = new BlackBox(Server, config.server, rootModule);
