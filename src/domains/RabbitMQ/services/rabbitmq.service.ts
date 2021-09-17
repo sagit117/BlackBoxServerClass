@@ -114,7 +114,12 @@ export default class RabbitmqService {
                         this.config.receive_queue_name,
                         processMsg,
                         this.config.channel.consume ||
-                            defaultConfig.channel.consume
+                            defaultConfig.channel.consume,
+                        (error: Error) => {
+                            if (error) {
+                                callbackChannel(false, error?.message, null);
+                            }
+                        }
                     );
                 }
             );
@@ -166,8 +171,6 @@ export default class RabbitmqService {
             channel: amqp.Channel | null
         ) => void
     ) {
-        // console.log(this.connect);
-
         this.connect?.createChannel((error: Error, ch) => {
             if (this.closeOnErr(error)) return;
 
@@ -178,7 +181,9 @@ export default class RabbitmqService {
                 this.config.send_exchange_type ||
                     defaultConfig.send_exchange_type,
                 this.config.channel.send || defaultConfig.channel.send,
-                (error) => callback(false, error.message, null)
+                (error) => {
+                    if (error) callback(false, error.message, null);
+                }
             );
 
             const sendingIsSuccess = ch.publish(

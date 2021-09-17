@@ -5,12 +5,12 @@
   "rabbitMQ": {
     "use": true,
     "url": "amqp://root:password@172.23.16.51:5672",
-    "receive_queue_name": "q_DispEvents",
-    "receive_exchange": "ex_DispEvents",
-    "receive_routing_key": "k_DispEvents",
-    "send_exchange": "ex_PreparedUserEvents",
+    "receive_queue_name": "q_TestUserEvents",
+    "receive_exchange": "ex_TestUserEvents",
+    "receive_routing_key": "k_TestUserEvents",
+    "send_exchange": "ex_TestUserEvents",
     "send_exchange_type": "fanout",
-    "send_routing_key": "k_PreparedUserEvents",
+    "send_routing_key": "k_TestUserEvents",
     "prefetch": 10,
     "channel": {
       "receive": {

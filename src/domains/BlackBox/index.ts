@@ -157,16 +157,24 @@ export default class BlackBox {
      */
     public sendRabbitMsg(
         msg: string,
-        callback: (
-            isOk: boolean,
-            errorMsg: string,
-            channel: amqp.Channel | null
-        ) => void
+        callback: (isOk: boolean, errorMsg: string) => void
     ) {
+        const cb = (isOk: boolean, errorMsg: string, channel: amqp.Channel) => {
+            channel?.on("error", (error: Error) => {
+                this.log(LogEvents.LogError, error.message);
+            });
+
+            channel?.on("close", () => {
+                this.log(LogEvents.LogWarning, "Rabbit channel is closing");
+            });
+
+            callback(isOk, errorMsg);
+        };
+
         this.rootModule.rabbitModule?.emitter.emit(
             RabbitEvents.SendMessage,
             msg,
-            callback
+            cb
         );
 
         return this;
