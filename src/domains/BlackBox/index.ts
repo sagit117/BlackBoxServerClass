@@ -21,7 +21,6 @@ export default class BlackBox {
     private server: http.Server;
     private config: blackbox.IConfigServer;
     private rootModule: RootModule;
-    private isReconnectRabbit: boolean = false;
 
     constructor(
         server: http.Server,
@@ -43,6 +42,7 @@ export default class BlackBox {
      */
     public listenedPort() {
         const port = this.config?.port || defaultConfig.port;
+
         this.server
             .listen(port, () => {
                 this.log(LogEvents.LogInfo, `Сервер слушает порт ${port}`);
@@ -83,8 +83,6 @@ export default class BlackBox {
         isReconnect: boolean = false,
         cbGetMsg: (msg: amqp.Message) => void
     ) {
-        this.isReconnectRabbit = isReconnect;
-
         /**
          * Слушатели событий канала rabbitMQ
          */
@@ -120,11 +118,11 @@ export default class BlackBox {
                 connection.on("error", (error: Error) => {
                     this.log(LogEvents.LogError, error.message);
 
-                    this.isReconnectRabbit &&
+                    isReconnect &&
                         setTimeout(
                             this.rabbitConnect.bind(
                                 this,
-                                this.isReconnectRabbit,
+                                isReconnect,
                                 cbGetMsg
                             ),
                             1000
@@ -147,6 +145,28 @@ export default class BlackBox {
             rabbitConnectCb,
             rabbitChannelCb,
             cbGetMsg
+        );
+
+        return this;
+    }
+
+    /**
+     * Отправка сообщений через rabbitMQ
+     * @param msg
+     * @param callback
+     */
+    public sendRabbitMsg(
+        msg: string,
+        callback: (
+            isOk: boolean,
+            errorMsg: string,
+            channel: amqp.Channel | null
+        ) => void
+    ) {
+        this.rootModule.rabbitModule?.emitter.emit(
+            RabbitEvents.SendMessage,
+            msg,
+            callback
         );
 
         return this;

@@ -1,5 +1,6 @@
 import { blackbox } from "../../../index.d";
 import amqp from "amqplib/callback_api";
+import { waitConnect } from "../rabbitmq.service.utils";
 
 const defaultConfig = {
     send_exchange_type: "fanout",
@@ -154,31 +155,30 @@ export default class RabbitmqService {
     /**
      * Канал для отправки
      * @param msg - сообщение для отправки
+     * @param callback
      */
-    public sendingMsg(msg: string) {
+    @waitConnect(1000)
+    public sendingMsg(
+        msg: string,
+        callback: (
+            isOk: boolean,
+            errorMsg: string,
+            channel: amqp.Channel | null
+        ) => void
+    ) {
+        console.log(this.connect);
+
         this.connect?.createChannel((error: Error, ch) => {
             if (this.closeOnErr(error)) return;
 
-            if (!ch) return;
-
-            // /**
-            //  * Слушатели событий канала
-            //  */
-            // ch.on("error", (error: Error) => {
-            //     //
-            // });
-            //
-            // ch.on("close", () => {
-            //     //
-            // });
-
-            /** ==== */
+            if (!ch) return callback(false, error.message, null);
 
             ch.assertExchange(
                 this.config.send_exchange,
                 this.config.send_exchange_type ||
                     defaultConfig.send_exchange_type,
-                this.config.channel.send || defaultConfig.channel.send
+                this.config.channel.send || defaultConfig.channel.send,
+                (error) => callback(false, error.message, null)
             );
 
             const sendingIsSuccess = ch.publish(
@@ -188,8 +188,13 @@ export default class RabbitmqService {
             );
 
             if (sendingIsSuccess) {
-                //
+                console.log(sendingIsSuccess);
+                callback(true, error.message, ch);
             }
         });
+    }
+
+    getConnect() {
+        return this.connect;
     }
 }

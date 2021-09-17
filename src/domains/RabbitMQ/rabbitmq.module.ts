@@ -4,6 +4,7 @@ import RabbitmqService from "./services/rabbitmq.service";
 
 export enum RabbitEvents {
     CreateConnect = "CreateConnect",
+    SendMessage = "SendMessage",
 }
 
 export default class RabbitmqModule extends BaseModule<
@@ -23,6 +24,11 @@ export default class RabbitmqModule extends BaseModule<
         this.emitter.addListeners(
             RabbitEvents.CreateConnect,
             this.service.connectRabbit
+        );
+
+        this.emitter.addListeners(
+            RabbitEvents.SendMessage,
+            this.service.sendingMsg
         );
     }
 }
