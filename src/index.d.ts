@@ -12,6 +12,9 @@ export namespace blackbox {
 
     export interface IConfigServer {
         port: number;
+        compression: {
+            level: number
+        }
     }
 
     export interface IConfigMongo {

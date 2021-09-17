@@ -1,4 +1,5 @@
 import { createApp, readConfig } from "./app";
+import Express from "express";
 
 export const BlackBox = createApp("./config.json");
 export const ReadConfig = readConfig;
@@ -14,3 +15,15 @@ BlackBox.listenedPort()
             console.log("isOk:", isOk, "errorMsg:", errorMsg);
         }
     );
+
+BlackBox.use(
+    (
+        req: Express.Request,
+        _res: Express.Response,
+        next: Express.NextFunction
+    ) => {
+        console.log(req);
+
+        next();
+    }
+);

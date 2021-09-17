@@ -6,6 +6,7 @@ import { MongoEvents } from "../MongoDB/mongodb.module";
 import { Error, Mongoose } from "mongoose";
 import { RabbitEvents } from "../RabbitMQ/rabbitmq.module";
 import amqp from "amqplib/callback_api";
+import E from "express";
 
 /**
  * Конфиг по умолчанию
@@ -21,11 +22,13 @@ export default class BlackBox {
     private server: http.Server;
     private config: blackbox.IConfigServer;
     private rootModule: RootModule;
+    private express: E.Express;
 
     constructor(
         server: http.Server,
         config: blackbox.IConfigServer,
-        rootModule: RootModule
+        rootModule: RootModule,
+        express: E.Express
     ) {
         console.log("created BlackBoxApp");
 
@@ -35,6 +38,7 @@ export default class BlackBox {
         this.server = server;
         this.config = config;
         this.rootModule = rootModule;
+        this.express = express;
     }
 
     /**
@@ -188,5 +192,9 @@ export default class BlackBox {
      */
     public log(type: LogEvents, msg: string) {
         this.rootModule.logModule?.emitter.emit(type, msg);
+    }
+
+    public use(arg: any) {
+        this.express.use(arg);
     }
 }

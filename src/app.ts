@@ -5,6 +5,7 @@ import fs from "fs";
 import { blackbox } from "./index.d";
 import RootModule from "./domains/RootModule";
 import { LogEvents } from "./domains/Log/log.module";
+import Compression from "compression";
 
 /**
  * Создаем приложение
@@ -63,7 +64,16 @@ export function createApp(pathToConfig: string) {
     /**
      * Создаем класс приложения
      */
-    const BlackBoxServer = new BlackBox(Server, config.server, rootModule);
+    const BlackBoxServer = new BlackBox(
+        Server,
+        config.server,
+        rootModule,
+        express
+    );
+
+    BlackBoxServer.use(
+        Compression(config?.server?.compression || { level: 6 })
+    );
 
     return BlackBoxServer;
 }

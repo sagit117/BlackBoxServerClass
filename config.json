@@ -1,6 +1,9 @@
 {
   "server": {
-    "port": 8081
+    "port": 8081,
+    "compression": {
+      "level": 6
+    }
   },
   "rabbitMQ": {
     "use": true,
