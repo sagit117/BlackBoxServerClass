@@ -196,6 +196,9 @@ export default class RabbitmqService {
         });
     }
 
+    /**
+     * Получаем инстанс соединения с rabbitMQ
+     */
     getConnect() {
         return this.connect;
     }
