@@ -1,4 +1,5 @@
 import { loggercolored } from "logger-colored";
+import Express from "express";
 
 export namespace blackbox {
     export interface IConfig {
@@ -81,4 +82,8 @@ export namespace blackbox {
             type: string;
         };
     }
+
+    export type Request = Express.Request
+    export type Response = Express.Response
+    export type NextFunction = Express.NextFunction
 }

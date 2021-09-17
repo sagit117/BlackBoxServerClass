@@ -196,5 +196,7 @@ export default class BlackBox {
 
     public use(arg: any) {
         this.express.use(arg);
+
+        return this;
     }
 }

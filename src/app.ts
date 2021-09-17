@@ -15,7 +15,7 @@ export function createApp(pathToConfig: string) {
     /**
      * Читаем настройки
      */
-    const config = readConfig(pathToConfig);
+    const config = readConfig<blackbox.IConfig>(pathToConfig);
 
     /**
      * Подключаем модули
@@ -71,6 +71,9 @@ export function createApp(pathToConfig: string) {
         express
     );
 
+    /**
+     * Устанавливаем middleware
+     */
     BlackBoxServer.use(
         Compression(config?.server?.compression || { level: 6 })
     );
@@ -82,10 +85,10 @@ export function createApp(pathToConfig: string) {
  * Читаем конфиг из файла
  * @param pathToConfig - путь до файла
  */
-export function readConfig(pathToConfig: string): blackbox.IConfig {
+export function readConfig<T>(pathToConfig: string): T {
     if (!pathToConfig) throw new Error("path to config cannot be undefined!");
 
-    let config: blackbox.IConfig;
+    let config: T;
 
     try {
         config = JSON.parse(fs.readFileSync(pathToConfig, "utf8"));
