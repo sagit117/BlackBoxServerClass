@@ -32,7 +32,7 @@ export function waitConnect(repeat: number) {
                 /**
                  * Вернем оригинальный метод с текущим контекстом
                  */
-                return originMethod.apply(target, args);
+                return originMethod.apply(this, args);
             }
         };
     };

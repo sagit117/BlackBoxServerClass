@@ -166,7 +166,7 @@ export default class RabbitmqService {
             channel: amqp.Channel | null
         ) => void
     ) {
-        console.log(this.connect);
+        // console.log(this.connect);
 
         this.connect?.createChannel((error: Error, ch) => {
             if (this.closeOnErr(error)) return;
@@ -187,10 +187,7 @@ export default class RabbitmqService {
                 Buffer.from(msg)
             );
 
-            if (sendingIsSuccess) {
-                console.log(sendingIsSuccess);
-                callback(true, error.message, ch);
-            }
+            callback(sendingIsSuccess, "", ch);
         });
     }
 
