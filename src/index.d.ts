@@ -15,6 +15,11 @@ export namespace blackbox {
         port: number;
         compression: {
             level: number
+        };
+        body_parser: {
+            limit: string,
+            extended: boolean,
+            parameterLimit: number
         }
     }
 

@@ -6,6 +6,7 @@ import { blackbox } from "./index.d";
 import RootModule from "./domains/RootModule";
 import { LogEvents } from "./domains/Log/log.module";
 import Compression from "compression";
+import BodyParser from "body-parser";
 
 /**
  * Создаем приложение
@@ -74,9 +75,27 @@ export function createApp(pathToConfig: string) {
     /**
      * Устанавливаем middleware
      */
+
     BlackBoxServer.use(
         Compression(config?.server?.compression || { level: 6 })
     );
+
+    /**
+     * Парсеры
+     */
+    const urlencodedParser = BodyParser.urlencoded(
+        config?.server?.body_parser || {
+            limit: "50mb",
+            extended: false,
+            parameterLimit: 50000,
+        }
+    ); // чтение данных из форм
+    const jsonParser = BodyParser.json({
+        limit: config?.server?.body_parser?.limit || "50mb",
+    }); // чтение данных из json
+
+    BlackBoxServer.use(urlencodedParser);
+    BlackBoxServer.use(jsonParser);
 
     return BlackBoxServer;
 }

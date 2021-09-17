@@ -3,6 +3,11 @@
     "port": 8081,
     "compression": {
       "level": 6
+    },
+    "body_parser": {
+      "limit": "50mb",
+      "extended": false,
+      "parameterLimit": 50000
     }
   },
   "rabbitMQ": {
