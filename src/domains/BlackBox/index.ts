@@ -21,6 +21,7 @@ export default class BlackBox {
     private server: http.Server;
     private config: blackbox.IConfigServer;
     private rootModule: RootModule;
+    private isReconnectRabbit: boolean = false;
 
     constructor(
         server: http.Server,
@@ -75,58 +76,77 @@ export default class BlackBox {
 
     /**
      * Подключение к rabbitMQ
+     * @param isReconnect - флаг для переподключения в случае ошибки
+     * @param cbGetMsg - callback сработает когда rabbit получит сообщение
      */
-    public rabbitConnect(isReconect: boolean = false) {
+    public rabbitConnect(
+        isReconnect: boolean = false,
+        cbGetMsg: (msg: amqp.Message) => void
+    ) {
+        this.isReconnectRabbit = isReconnect;
+
+        /**
+         * Слушатели событий канала rabbitMQ
+         */
+        const rabbitChannelCb = (
+            isOk: boolean,
+            errorMsg: string,
+            channel: amqp.Channel
+        ) => {
+            if (isOk && channel) {
+                channel.on("error", (error: Error) => {
+                    this.log(LogEvents.LogError, error.message);
+                });
+
+                channel.on("close", () => {
+                    this.log(LogEvents.LogWarning, "Rabbit channel is closing");
+                });
+            } else {
+                this.log(LogEvents.LogWarning, errorMsg);
+            }
+        };
+
+        /**
+         * Слушатели событий соединения rabbitMQ
+         */
+        const rabbitConnectCb = (
+            isOk: boolean,
+            errorMsg: string,
+            connection: amqp.Connection
+        ) => {
+            if (isOk && connection) {
+                this.log(LogEvents.LogInfo, "Подключились к RabbitMQ");
+
+                connection.on("error", (error: Error) => {
+                    this.log(LogEvents.LogError, error.message);
+
+                    this.isReconnectRabbit &&
+                        setTimeout(
+                            this.rabbitConnect.bind(
+                                this,
+                                this.isReconnectRabbit,
+                                cbGetMsg
+                            ),
+                            1000
+                        );
+                });
+
+                connection.on("close", () => {
+                    this.log(
+                        LogEvents.LogWarning,
+                        "Rabbit connection is closing"
+                    );
+                });
+            } else {
+                throw new Error(errorMsg);
+            }
+        };
+
         this.rootModule.rabbitModule?.emitter.emit(
             RabbitEvents.CreateConnect,
-            (
-                isOk: boolean,
-                errorMsg: string,
-                connection: amqp.Connection,
-                channel: amqp.Channel
-            ) => {
-                if (isOk) {
-                    this.log(LogEvents.LogInfo, "Подключились к RabbitMQ");
-
-                    /**
-                     * Слушатели событий соединения
-                     */
-                    connection.on("error", (error: Error) => {
-                        this.log(LogEvents.LogError, error.message);
-
-                        isReconect &&
-                            setTimeout(
-                                this.rabbitConnect.bind(this, isReconect),
-                                1000
-                            );
-                    });
-
-                    connection.on("close", () => {
-                        this.log(
-                            LogEvents.LogWarning,
-                            "Rabbit connection is closing"
-                        );
-                    });
-
-                    /**
-                     * Слушатели событий канала
-                     */
-                    if (channel) {
-                        channel.on("error", (error: Error) => {
-                            this.log(LogEvents.LogError, error.message);
-                        });
-
-                        channel.on("close", () => {
-                            this.log(
-                                LogEvents.LogWarning,
-                                "Rabbit channel is closing"
-                            );
-                        });
-                    }
-                } else {
-                    throw new Error(errorMsg);
-                }
-            }
+            rabbitConnectCb,
+            rabbitChannelCb,
+            cbGetMsg
         );
 
         return this;

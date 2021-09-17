@@ -31,24 +31,31 @@ export default class RabbitmqService {
 
     /**
      * Соединение с rabbitMQ
-     * @param callback
+     * @param callbackConnect
+     * @param callbackChannel
+     * @param cbGetMessage
      */
     public connectRabbit(
-        callback: (
+        callbackConnect: (
             isOk: boolean,
             errorMsg: string,
-            connection: amqp.Connection | null,
+            connection: amqp.Connection | null
+        ) => void,
+        callbackChannel: (
+            isOk: boolean,
+            errorMsg: string,
             channel: amqp.Channel | null
-        ) => void
+        ) => void,
+        cbGetMessage: (msg: amqp.Message) => void
     ) {
         amqp.connect(this.config.url, (error: Error, connection) => {
             if (error) {
-                callback(false, error.message, null, null);
+                callbackConnect(false, error.message, null);
 
                 return;
             }
 
-            callback(true, "", connection, null);
+            callbackConnect(true, "", connection);
 
             /** ==== */
 
@@ -60,22 +67,23 @@ export default class RabbitmqService {
             /**
              * Создание канала получения
              */
-            this.receiveMsg(callback);
+            this.receiveMsg(callbackChannel, cbGetMessage);
         });
     }
 
     private receiveMsg(
-        callback: (
+        callbackChannel: (
             isOk: boolean,
             errorMsg: string,
-            connection: amqp.Connection | null,
             channel: amqp.Channel | null
-        ) => void
+        ) => void,
+        cbGetMessage: (msg: amqp.Message) => void
     ) {
         this.connect?.createChannel((error, ch) => {
             if (this.closeOnErr(error)) return;
 
-            callback(true, "", this.connect || null, ch);
+            callbackChannel(true, "", ch);
+
             /**
              * Процесс обработки получения сообщений
              * @param msg
@@ -126,7 +134,7 @@ export default class RabbitmqService {
          * @param cb
          */
         function work(msg: amqp.Message, cb: (ok: boolean) => void) {
-            console.log(msg.content.toString());
+            cbGetMessage(msg);
             cb(true);
         }
     }
