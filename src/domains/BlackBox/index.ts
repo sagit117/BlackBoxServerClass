@@ -3,7 +3,7 @@ import { blackbox } from "../../index.d";
 import RootModule from "../RootModule";
 import { LogEvents } from "../Log/log.module";
 import { MongoEvents } from "../MongoDB/mongodb.module";
-import { Error, Mongoose } from "mongoose";
+import { Mongoose } from "mongoose";
 import { RabbitEvents } from "../RabbitMQ/rabbitmq.module";
 import amqp from "amqplib/callback_api";
 import E from "express";

@@ -40,7 +40,7 @@
       "host": "localhost",
       "port": 27017,
       "user_name": "admin",
-      "password": "neoBorg666",
+      "password": "paSw0rd!",
       "db_name": "blackBox",
       "string_options": "?authSource=admin"
     }
