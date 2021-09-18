@@ -5,16 +5,18 @@ import fs from "fs";
 import { blackbox } from "./index.d";
 import RootModule from "./domains/RootModule";
 import { LogEvents } from "./domains/Log/log.module";
+import Compression from "compression";
+import BodyParser from "body-parser";
 
 /**
- * Создаем сервер
+ * Создаем приложение
  * @param pathToConfig
  */
-export function createServer(pathToConfig: string) {
+export function createApp(pathToConfig: string) {
     /**
      * Читаем настройки
      */
-    const config = readConfig(pathToConfig);
+    const config = readConfig<blackbox.IConfig>(pathToConfig);
 
     /**
      * Подключаем модули
@@ -31,11 +33,69 @@ export function createServer(pathToConfig: string) {
      * Обработчики неизвестных ошибок
      */
     process.on("uncaughtException", (error) => {
-        rootModule.logModule?.emitter?.emit(LogEvents.LogError, error.message);
+        rootModule.logModule?.emitter?.emit(
+            LogEvents.LogError,
+            error.message + " " + error.stack
+        );
         process.exit(1);
     });
 
-    const BlackBoxServer = new BlackBox(Server, config.server, rootModule);
+    /**
+     * Обработчик ошибок в promises
+     */
+    process.on("unhandledRejection", (reason, _promise) => {
+        rootModule.logModule?.emitter?.emit(LogEvents.LogError, reason);
+    });
+
+    /**
+     * Обработчики выхода
+     */
+    const exits = ["exit", "SIGTERM", "SIGINT", "SIGHUP", "SIGQUIT"];
+    exits.forEach((event) => {
+        process.on(event, (code) => {
+            rootModule.logModule?.emitter.emit(
+                LogEvents.LogInfo,
+                `server остановлен по коду ${code}`
+            );
+
+            process.exit(code);
+        });
+    });
+
+    /**
+     * Создаем класс приложения
+     */
+    const BlackBoxServer = new BlackBox(
+        Server,
+        config.server,
+        rootModule,
+        express
+    );
+
+    /**
+     * Устанавливаем middleware
+     */
+
+    BlackBoxServer.use(
+        Compression(config?.server?.compression || { level: 6 })
+    );
+
+    /**
+     * Парсеры
+     */
+    const urlencodedParser = BodyParser.urlencoded(
+        config?.server?.body_parser || {
+            limit: "50mb",
+            extended: false,
+            parameterLimit: 50000,
+        }
+    ); // чтение данных из форм
+    const jsonParser = BodyParser.json({
+        limit: config?.server?.body_parser?.limit || "50mb",
+    }); // чтение данных из json
+
+    BlackBoxServer.use(urlencodedParser);
+    BlackBoxServer.use(jsonParser);
 
     return BlackBoxServer;
 }
@@ -44,10 +104,10 @@ export function createServer(pathToConfig: string) {
  * Читаем конфиг из файла
  * @param pathToConfig - путь до файла
  */
-export function readConfig(pathToConfig: string): blackbox.IConfig {
+export function readConfig<T>(pathToConfig: string): T {
     if (!pathToConfig) throw new Error("path to config cannot be undefined!");
 
-    let config: blackbox.IConfig;
+    let config: T;
 
     try {
         config = JSON.parse(fs.readFileSync(pathToConfig, "utf8"));

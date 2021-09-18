@@ -1,8 +1,9 @@
 import LogEmitter from "./emitters/log.emitter";
 import LogService from "./services/log.service";
+import BaseModule from "../BaseModule";
 
 /**
- * События для слушателя логера
+ * События для слушателя логгера
  */
 export enum LogEvents {
     LogInfo = "LogInfo",
@@ -15,26 +16,18 @@ export enum LogEvents {
  * @param emitter
  * @param service
  */
-export default class LogModule {
-    public emitter: LogEmitter;
-    private service: LogService;
-
+export default class LogModule extends BaseModule<LogEmitter, LogService> {
     constructor(emitter: LogEmitter, service: LogService) {
+        super(emitter, service);
+
         console.log("created LogModule");
-
-        this.emitter = emitter;
-        this.service = service;
-
-        this.addListeners();
     }
 
     /**
-     * Создаем слушатели логера
+     * Создаем слушатели логгера
      * @private
      */
-    private addListeners() {
-        console.log("created listeners for logger");
-
+    protected addListeners() {
         this.emitter.addListeners(LogEvents.LogInfo, this.service.LogInfo);
         this.emitter.addListeners(LogEvents.LogError, this.service.LogError);
         this.emitter.addListeners(

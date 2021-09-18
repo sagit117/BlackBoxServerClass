@@ -1,6 +1,49 @@
 {
   "server": {
-    "port": 8081
+    "port": 8081,
+    "compression": {
+      "level": 6
+    },
+    "body_parser": {
+      "limit": "50mb",
+      "extended": false,
+      "parameterLimit": 50000
+    }
+  },
+  "rabbitMQ": {
+    "use": true,
+    "url": "amqp://root:password@172.23.16.51:5672",
+    "receive_queue_name": "q_TestUserEvents",
+    "receive_exchange": "ex_TestUserEvents",
+    "receive_routing_key": "k_TestUserEvents",
+    "send_exchange": "ex_TestUserEvents",
+    "send_exchange_type": "fanout",
+    "send_routing_key": "k_TestUserEvents",
+    "prefetch": 10,
+    "channel": {
+      "receive": {
+        "durable": true,
+        "autoDelete": false,
+        "messageTtl": 600000
+      },
+      "consume": {
+        "noAck": false
+      },
+      "send": {
+        "durable": true
+      }
+    }
+  },
+  "DB": {
+    "mongo": {
+      "use": true,
+      "host": "localhost",
+      "port": 27017,
+      "user_name": "admin",
+      "password": "neoBorg666",
+      "db_name": "blackBox",
+      "string_options": "?authSource=admin"
+    }
   },
   "logger": {
     "INFO": {
