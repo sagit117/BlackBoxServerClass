@@ -199,4 +199,8 @@ export default class BlackBox {
 
         return this;
     }
+
+    public methods() {
+        return this.express;
+    }
 }

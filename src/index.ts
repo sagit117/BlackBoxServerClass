@@ -1,8 +1,9 @@
-import { createApp, readConfig } from "./app";
+import { createApp, readConfig, ServerCode } from "./app";
 import { blackbox } from "./index.d";
 
 export const BlackBox = createApp("./config.json");
 export const ReadConfig = readConfig;
+export const BlackBoxServerCode = ServerCode;
 
 BlackBox.listenedPort()
     .mongoConnect()
@@ -21,8 +22,14 @@ BlackBox.listenedPort()
             _res: blackbox.Response,
             next: blackbox.NextFunction
         ) => {
-            console.log(req);
+            console.log(req.url);
 
             next();
         }
-    );
+    )
+    .methods()
+    .get("/test", (_req, res, next) => {
+        res.status(BlackBoxServerCode.OK).send("ok");
+
+        next();
+    });
