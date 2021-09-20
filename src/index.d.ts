@@ -6,9 +6,10 @@ export namespace blackbox {
         server: IConfigServer;
         logger: IloggerConfig;
         DB: {
-            mongo: IConfigMongo
-        },
-        rabbitMQ: IConfigRabbit
+            mongo: IConfigMongo;
+        };
+        rabbitMQ: IConfigRabbit;
+        ws: IWSConfig;
     }
 
     export interface IConfigServer {
@@ -86,6 +87,10 @@ export namespace blackbox {
             };
             type: string;
         };
+    }
+
+    export interface IWSConfig {
+        use: boolean
     }
 
     export type Request = Express.Request

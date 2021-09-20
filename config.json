@@ -10,6 +10,9 @@
       "parameterLimit": 50000
     }
   },
+  "ws": {
+    "use": true
+  },
   "rabbitMQ": {
     "use": true,
     "url": "amqp://root:password@172.23.16.51:5672",

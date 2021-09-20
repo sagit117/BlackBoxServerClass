@@ -9,6 +9,9 @@ import MongodbModule from "./MongoDB/mongodb.module";
 import RabbitmqService from "./RabbitMQ/services/rabbitmq.service";
 import RabbitmqEmitter from "./RabbitMQ/emitters/rabbitmq.emitter";
 import RabbitmqModule from "./RabbitMQ/rabbitmq.module";
+import WebsocketModule from "./WebSocket/websocket.module";
+import WebsocketService from "./WebSocket/service/websocket.service";
+import WebsocketEmitter from "./WebSocket/emitters/websocket.emitter";
 
 /**
  * Активирует все модули
@@ -17,6 +20,7 @@ export default class RootModule {
     public readonly logModule: LogModule | undefined;
     public readonly mongoModule: MongodbModule | undefined;
     public readonly rabbitModule: RabbitmqModule | undefined;
+    public readonly websocketModule: WebsocketModule | undefined;
 
     constructor(config: blackbox.IConfig) {
         console.log("created RootModule");
@@ -55,6 +59,16 @@ export default class RootModule {
                 rabbitEmitter,
                 rabbitService
             );
+        }
+
+        /**
+         * Подключение к websocket
+         */
+        if (config.ws?.use) {
+            const wsService = new WebsocketService(config.ws);
+            const wsEmitter = new WebsocketEmitter(wsService);
+
+            this.websocketModule = new WebsocketModule(wsEmitter, wsService);
         }
     }
 }
