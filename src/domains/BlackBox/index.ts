@@ -243,19 +243,26 @@ export default class BlackBox {
         controllers.forEach((controller) => {
             const router = E.Router();
 
-            routes.clearRoutes();
-            routes.getRoutes().forEach((r) => {
-                router[r.type](
-                    r.route,
-                    (req: blackbox.Request, res: blackbox.Response) => {
-                        const ctl = new controller(req, res);
-                        console.log(ctl[r.method]);
-                        ctl[r.method]();
-                    }
-                );
+            const cb =
+                (r: { method: string }) =>
+                (
+                    req: blackbox.Request,
+                    res: blackbox.Response,
+                    next: blackbox.NextFunction
+                ) => {
+                    const ctl = new controller(req, res);
 
-                console.log(r);
+                    if (ctl[r.method]) ctl[r.method]?.();
+
+                    next();
+                };
+
+            routes.getRoutes().forEach((r) => {
+                router[r.type](r.route, cb(r));
             });
+
+            // console.log(routes.getRoutes(), controller);
+            // routes.clearRoutes();
 
             this.use(router);
         });

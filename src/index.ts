@@ -59,7 +59,7 @@ BlackBox.listenedPort()
 
 class TestController extends BaseController {
     @GET("/api/v1/user/get/:id")
-    getUser() {
+    public getUser() {
         const { id } = this.useParams<{ id: number }>();
 
         return this.response
@@ -68,7 +68,7 @@ class TestController extends BaseController {
     }
 
     @POST("/api/v1/user/set-name")
-    setUserName() {
+    public setUserName() {
         const { name, id } = this.useBody<{ name: string; id: number }>();
 
         return this.response.status(ServerCode.OK).send({ id, name });
@@ -77,7 +77,7 @@ class TestController extends BaseController {
 
 class TestController2 extends BaseController {
     @DELETE("/api/v1/user/delete/:id")
-    userRemove() {
+    public userRemove() {
         const { id } = this.useParams<{ id: number }>();
 
         return this.response
@@ -86,4 +86,4 @@ class TestController2 extends BaseController {
     }
 }
 
-BlackBox.addControllers([TestController, TestController2]);
+BlackBox.addControllers([TestController]).addControllers([TestController2]);

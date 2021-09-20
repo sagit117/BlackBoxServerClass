@@ -8,6 +8,7 @@ export function GET(path: string) {
     ) {
         const originalMethod = descriptor.value;
 
+        console.log(_target);
         routes.addRoute(path, method, "get");
 
         descriptor.value = function (...args: any[]) {
@@ -24,6 +25,8 @@ export function POST(path: string) {
     ) {
         const originalMethod = descriptor.value;
 
+        console.log(_target);
+
         routes.addRoute(path, method, "post");
 
         descriptor.value = function (...args: any[]) {
@@ -39,6 +42,8 @@ export function DELETE(path: string) {
         descriptor: PropertyDescriptor
     ) {
         const originalMethod = descriptor.value;
+
+        console.log(_target);
 
         routes.addRoute(path, method, "delete");
 
