@@ -1,7 +1,8 @@
 import { blackbox } from "../../../index.d";
+import WebSocket from "ws";
 
 export default class WebsocketService {
-    private config: blackbox.IWSConfig;
+    private readonly config: blackbox.IWSConfig;
 
     constructor(config: blackbox.IWSConfig) {
         console.log("created WebsocketService");
@@ -9,5 +10,11 @@ export default class WebsocketService {
         this.config = config;
     }
 
-    public create() {}
+    public create(cb: (wss: WebSocket.Server, ws: WebSocket) => void) {
+        const webSocketServer = new WebSocket.Server(this.config);
+
+        webSocketServer.on("connection", (ws) => {
+            cb(webSocketServer, ws);
+        });
+    }
 }

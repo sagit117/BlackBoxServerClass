@@ -11,7 +11,8 @@
     }
   },
   "ws": {
-    "use": true
+    "use": true,
+    "port": 8082
   },
   "rabbitMQ": {
     "use": true,

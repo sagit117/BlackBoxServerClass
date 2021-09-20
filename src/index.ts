@@ -16,6 +16,16 @@ BlackBox.listenedPort()
             console.log("isOk:", isOk, "errorMsg:", errorMsg);
         }
     )
+    .WSConnect(
+        (msg: blackbox.WSMessage) => {
+            console.log("ws message:", msg.toString());
+        },
+        (wss, ws) => {
+            ws.send("hello");
+
+            wss.clients.forEach((i) => i.send("hello world!"));
+        }
+    )
     .use(
         (
             req: blackbox.Request,

@@ -30,6 +30,7 @@
     "@types/amqplib": "^0.8.2",
     "@types/compression": "^1.7.2",
     "@types/node": "^16.9.1",
+    "@types/ws": "^7.4.7",
     "npm-check-updates": "^11.8.5",
     "prettier": "^2.4.1",
     "rimraf": "^3.0.2",
@@ -44,6 +45,7 @@
     "express": "^4.17.1",
     "logger-colored": "^1.0.2",
     "mongodb": "^4.1.2",
-    "mongoose": "^6.0.6"
+    "mongoose": "^6.0.6",
+    "ws": "^8.2.2"
   }
 }

@@ -7,6 +7,8 @@ import { Error, Mongoose } from "mongoose";
 import { RabbitEvents } from "../RabbitMQ/rabbitmq.module";
 import amqp from "amqplib/callback_api";
 import E from "express";
+import { WebsocketEvents } from "../WebSocket/websocket.module";
+import WebSocket from "ws";
 
 /**
  * Конфиг по умолчанию
@@ -22,7 +24,7 @@ export default class BlackBox {
     private server: http.Server;
     private config: blackbox.IConfigServer;
     private rootModule: RootModule;
-    private express: E.Express;
+    private readonly express: E.Express;
 
     constructor(
         server: http.Server,
@@ -177,6 +179,35 @@ export default class BlackBox {
             RabbitEvents.SendMessage,
             msg,
             cb
+        );
+
+        return this;
+    }
+
+    /**
+     * Соединение с WebSocket
+     * @constructor
+     */
+    public WSConnect(
+        cbGetMessage: (msg: blackbox.WSMessage) => void,
+        cbConnect: (wss: WebSocket.Server, ws: WebSocket) => void
+    ) {
+        this.rootModule.websocketModule?.emitter.emit(
+            WebsocketEvents.CreateConnect,
+            (wss: WebSocket.Server, ws: WebSocket) => {
+                /**
+                 * Обрабатываем то, что отправил клиент
+                 */
+                ws.on("message", cbGetMessage);
+
+                ws.on("error", (e) => {
+                    this.log(LogEvents.LogError, e.message);
+
+                    ws.send(e);
+                });
+
+                cbConnect(wss, ws);
+            }
         );
 
         return this;

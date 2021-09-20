@@ -1,5 +1,8 @@
 import { loggercolored } from "logger-colored";
 import Express from "express";
+import * as http from "http";
+import * as https from "https";
+import { PerMessageDeflateOptions, VerifyClientCallbackAsync, VerifyClientCallbackSync } from "ws";
 
 export namespace blackbox {
     export interface IConfig {
@@ -90,8 +93,21 @@ export namespace blackbox {
     }
 
     export interface IWSConfig {
-        use: boolean
+        use: boolean;
+        host?: string
+        port?: number
+        backlog?: number
+        server?: http.Server | https.Server
+        verifyClient?: VerifyClientCallbackAsync | VerifyClientCallbackSync
+        handleProtocols?: any
+        path?: string
+        noServer?: boolean
+        clientTracking?: boolean
+        perMessageDeflate?: boolean | PerMessageDeflateOptions
+        maxPayload?: number
     }
+
+    export type WSMessage = string | Buffer | ArrayBuffer | Buffer[]
 
     export type Request = Express.Request
     export type Response = Express.Response
