@@ -1,5 +1,7 @@
 import { createApp, readConfig, ServerCode } from "./app";
 import { blackbox } from "./index.d";
+import BaseController from "./utils/BaseController";
+import { GET, POST, DELETE } from "./utils/decorators";
 
 export const BlackBox = createApp("./config.json");
 export const ReadConfig = readConfig;
@@ -54,3 +56,34 @@ BlackBox.listenedPort()
 
         next();
     });
+
+class TestController extends BaseController {
+    @GET("/api/v1/user/get/:id")
+    getUser() {
+        const { id } = this.useParams<{ id: number }>();
+
+        return this.response
+            .status(ServerCode.OK)
+            .send({ id: id, name: "test-user" });
+    }
+
+    @POST("/api/v1/user/set-name")
+    setUserName() {
+        const { name, id } = this.useBody<{ name: string; id: number }>();
+
+        return this.response.status(ServerCode.OK).send({ id, name });
+    }
+}
+
+class TestController2 extends BaseController {
+    @DELETE("/api/v1/user/delete/:id")
+    userRemove() {
+        const { id } = this.useParams<{ id: number }>();
+
+        return this.response
+            .status(ServerCode.OK)
+            .send(`user id ${id} remove!`);
+    }
+}
+
+BlackBox.addControllers([TestController, TestController2]);

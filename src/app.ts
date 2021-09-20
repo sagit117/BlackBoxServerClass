@@ -10,7 +10,7 @@ import BodyParser from "body-parser";
 
 /**
  * Создаем приложение
- * @param pathToConfig
+ * @param pathToConfig - путь до json-файла конфигураций
  */
 export function createApp(pathToConfig: string) {
     /**

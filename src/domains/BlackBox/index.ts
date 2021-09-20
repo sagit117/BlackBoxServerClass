@@ -9,6 +9,8 @@ import amqp from "amqplib/callback_api";
 import E from "express";
 import { WebsocketEvents } from "../WebSocket/websocket.module";
 import WebSocket from "ws";
+import BaseController from "../../utils/BaseController";
+import routes from "../Routes";
 
 /**
  * Конфиг по умолчанию
@@ -231,5 +233,33 @@ export default class BlackBox {
 
     public methods() {
         return this.express;
+    }
+
+    /**
+     * Создаем связь маршрута и контроллера
+     * @param controllers
+     */
+    public addControllers(controllers: typeof BaseController[]) {
+        controllers.forEach((controller) => {
+            const router = E.Router();
+
+            routes.clearRoutes();
+            routes.getRoutes().forEach((r) => {
+                router[r.type](
+                    r.route,
+                    (req: blackbox.Request, res: blackbox.Response) => {
+                        const ctl = new controller(req, res);
+                        console.log(ctl[r.method]);
+                        ctl[r.method]();
+                    }
+                );
+
+                console.log(r);
+            });
+
+            this.use(router);
+        });
+
+        return this;
     }
 }
