@@ -8,18 +8,38 @@ export type TTypeRoute =
     | "options"
     | "head";
 
+interface IRoutes {
+    route: string;
+    method: string;
+    type: TTypeRoute;
+}
+
+/**
+ * Класс отвечает за авто составление маршрутов
+ */
 class Routes {
-    private routes: { route: string; method: string; type: TTypeRoute }[] = [];
+    private routes: IRoutes[] = [];
+    private controllers: {
+        name: string;
+        routes: IRoutes[];
+        path: string;
+        [k: string]: any;
+    }[] = [];
 
     public addRoute(route: string, method: string, type: TTypeRoute) {
         this.routes.push({ route, method, type });
     }
 
-    public getRoutes() {
-        return this.routes;
+    public addControllers(name: string, path: string) {
+        this.controllers.push({ name, routes: this.routes, path });
+        this.clearRoutes();
     }
 
-    public clearRoutes() {
+    public getRoutes(name: string) {
+        return this.controllers.find((c) => c.name === name);
+    }
+
+    private clearRoutes() {
         this.routes = [];
     }
 }

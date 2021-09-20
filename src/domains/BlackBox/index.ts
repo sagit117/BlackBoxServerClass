@@ -225,8 +225,8 @@ export default class BlackBox {
         this.rootModule.logModule?.emitter.emit(type, msg);
     }
 
-    public use(arg: any) {
-        this.express.use(arg);
+    public use(...arg: any[]) {
+        this.express.use(...arg);
 
         return this;
     }
@@ -257,14 +257,13 @@ export default class BlackBox {
                     next();
                 };
 
-            routes.getRoutes().forEach((r) => {
+            const route = routes.getRoutes(controller.name);
+
+            route?.routes.forEach((r) => {
                 router[r.type](r.route, cb(r));
             });
 
-            // console.log(routes.getRoutes(), controller);
-            // routes.clearRoutes();
-
-            this.use(router);
+            this.use(route?.path || "/", router);
         });
 
         return this;

@@ -8,7 +8,6 @@ export function GET(path: string) {
     ) {
         const originalMethod = descriptor.value;
 
-        console.log(_target);
         routes.addRoute(path, method, "get");
 
         descriptor.value = function (...args: any[]) {
@@ -24,8 +23,6 @@ export function POST(path: string) {
         descriptor: PropertyDescriptor
     ) {
         const originalMethod = descriptor.value;
-
-        console.log(_target);
 
         routes.addRoute(path, method, "post");
 
@@ -43,12 +40,20 @@ export function DELETE(path: string) {
     ) {
         const originalMethod = descriptor.value;
 
-        console.log(_target);
-
         routes.addRoute(path, method, "delete");
 
         descriptor.value = function (...args: any[]) {
             return originalMethod.apply(this, args);
         };
+    };
+}
+
+export function controller(path: string) {
+    return function (target: Function) {
+        if (typeof path !== "string") {
+            throw new Error("Request path must be string");
+        }
+
+        routes.addControllers(target.name, path);
     };
 }
