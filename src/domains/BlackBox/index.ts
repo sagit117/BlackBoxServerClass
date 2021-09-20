@@ -3,7 +3,7 @@ import { blackbox } from "../../index.d";
 import RootModule from "../RootModule";
 import { LogEvents } from "../Log/log.module";
 import { MongoEvents } from "../MongoDB/mongodb.module";
-import { Mongoose } from "mongoose";
+import { Error, Mongoose } from "mongoose";
 import { RabbitEvents } from "../RabbitMQ/rabbitmq.module";
 import amqp from "amqplib/callback_api";
 import E from "express";
@@ -64,13 +64,11 @@ export default class BlackBox {
     public mongoConnect() {
         this.rootModule.mongoModule?.emitter.emit(
             MongoEvents.CreateConnect,
-            (conn: typeof Mongoose) => {
-                if (conn) {
-                    this.log(LogEvents.LogInfo, "Подключились к MongoDB");
+            (conn: typeof Mongoose | Error) => {
+                if (conn instanceof Error) {
+                    throw new Error(conn.message);
                 } else {
-                    throw new Error(
-                        "Произошла ошибка при подключение к MongoDB"
-                    );
+                    this.log(LogEvents.LogInfo, "Подключились к MongoDB");
                 }
             }
         );

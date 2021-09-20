@@ -28,8 +28,19 @@ BlackBox.listenedPort()
         }
     )
     .methods()
-    .get("/test", (_req, res, next) => {
-        res.status(BlackBoxServerCode.OK).send("ok");
+    .get("/test/:id", (req, res, next) => {
+        const { id }: { id: string } = req.params;
+        res.status(BlackBoxServerCode.OK).send("OK GET");
+
+        console.log(id);
+
+        next();
+    })
+    .post("/testpost", (req, res, next) => {
+        const params: any = req.body;
+        res.status(BlackBoxServerCode.OK).send("OK POST");
+
+        console.log(params);
 
         next();
     });

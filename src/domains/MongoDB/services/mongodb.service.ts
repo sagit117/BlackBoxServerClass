@@ -13,7 +13,7 @@ export default class MongodbService {
     /**
      * Создает соединение с БД
      */
-    public connect(callback: (conn: typeof Mongoose) => void): void {
+    public connect(callback: (conn: typeof Mongoose | Error) => void) {
         Mongoose.connect(
             `mongodb://${this.config.host}:${this.config.port}${this.config.string_options}`,
             {
@@ -22,8 +22,12 @@ export default class MongodbService {
                 user: this.config.user_name,
                 pass: this.config.password,
             }
-        ).then((res) => {
-            callback(res);
-        });
+        )
+            .then((res) => {
+                callback(res);
+            })
+            .catch((error: Error) => {
+                callback(error);
+            });
     }
 }
