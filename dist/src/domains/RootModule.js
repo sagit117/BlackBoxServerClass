@@ -1,0 +1,60 @@
+import LogModule from "./Log/log.module";
+import LogEmitter from "./Log/emitters/log.emitter";
+import ColoredLogger from "logger-colored";
+import LogService from "./Log/services/log.service";
+import MongodbService from "./MongoDB/services/mongodb.service";
+import MongodbEmitter from "./MongoDB/emitters/mongodb.emitter";
+import MongodbModule from "./MongoDB/mongodb.module";
+import RabbitmqService from "./RabbitMQ/services/rabbitmq.service";
+import RabbitmqEmitter from "./RabbitMQ/emitters/rabbitmq.emitter";
+import RabbitmqModule from "./RabbitMQ/rabbitmq.module";
+import WebsocketModule from "./WebSocket/websocket.module";
+import WebsocketService from "./WebSocket/service/websocket.service";
+import WebsocketEmitter from "./WebSocket/emitters/websocket.emitter";
+/**
+ * Активирует все модули
+ */
+export default class RootModule {
+    logModule;
+    mongoModule;
+    rabbitModule;
+    websocketModule;
+    constructor(config) {
+        console.log("created RootModule");
+        /**
+         * Подключаем модуль логгера
+         */
+        if (config.logger) {
+            console.log("created ColoredLogger");
+            const logger = new ColoredLogger(config.logger);
+            const logService = new LogService(logger);
+            const logEmitter = new LogEmitter(logService);
+            this.logModule = new LogModule(logEmitter, logService);
+        }
+        /**
+         * Подключаем модуль mongo
+         */
+        if (config.DB?.mongo?.use) {
+            const mongoService = new MongodbService(config.DB.mongo);
+            const mongoEmitter = new MongodbEmitter(mongoService);
+            this.mongoModule = new MongodbModule(mongoEmitter, mongoService);
+        }
+        /**
+         * Подключение к rabbit
+         */
+        if (config.rabbitMQ?.use) {
+            const rabbitService = new RabbitmqService(config.rabbitMQ);
+            const rabbitEmitter = new RabbitmqEmitter(rabbitService);
+            this.rabbitModule = new RabbitmqModule(rabbitEmitter, rabbitService);
+        }
+        /**
+         * Подключение к websocket
+         */
+        if (config.ws?.use) {
+            const wsService = new WebsocketService(config.ws);
+            const wsEmitter = new WebsocketEmitter(wsService);
+            this.websocketModule = new WebsocketModule(wsEmitter, wsService);
+        }
+    }
+}
+//# sourceMappingURL=RootModule.js.map

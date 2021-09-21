@@ -1,0 +1,1 @@
+{"version":3,"file":"mongodb.emitter.d.ts","sourceRoot":"","sources":["../../../../../src/domains/MongoDB/emitters/mongodb.emitter.ts"],"names":[],"mappings":"AAAA,OAAO,YAAY,MAAM,sBAAsB,CAAC;AAEhD,MAAM,CAAC,OAAO,OAAO,cAAe,SAAQ,YAAY;gBACxC,KAAK,CAAC,EAAE,GAAG;CAI1B"}

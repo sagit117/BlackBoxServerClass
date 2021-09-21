@@ -1,6 +1,6 @@
 {
   "name": "blackboxserverclass",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "application for quick server creation",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
@@ -11,7 +11,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start:dev": "ts-node ./src/index.ts",
     "ncu": "ncu",
-    "up": "ncu && ncu -u && rimraf ./package-lock.json && npm i"
+    "up": "ncu && ncu -u && rimraf ./package-lock.json && npm i",
+    "build": "rimraf ./dist && tsc"
   },
   "keywords": [
     "quick",

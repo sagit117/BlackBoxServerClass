@@ -1,0 +1,1 @@
+{"version":3,"file":"BaseModule.d.ts","sourceRoot":"","sources":["../../../src/domains/BaseModule.ts"],"names":[],"mappings":"AAAA,MAAM,CAAC,OAAO,OAAO,UAAU,CAAC,OAAO,EAAE,OAAO;IACrC,OAAO,EAAE,OAAO,CAAC;IACxB,SAAS,CAAC,OAAO,EAAE,OAAO,CAAC;gBAEf,OAAO,EAAE,OAAO,EAAE,OAAO,EAAE,OAAO;IAO9C,SAAS,CAAC,YAAY;CACzB"}

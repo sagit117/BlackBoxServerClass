@@ -1,0 +1,1 @@
+{"version":3,"file":"log.service.d.ts","sourceRoot":"","sources":["../../../../../src/domains/Log/services/log.service.ts"],"names":[],"mappings":"AAAA,OAAO,aAAa,MAAM,gBAAgB,CAAC;AAE3C,MAAM,CAAC,OAAO,OAAO,UAAU;IAC3B,OAAO,CAAC,QAAQ,CAAC,MAAM,CAAgB;gBAE3B,MAAM,EAAE,aAAa;IAQ1B,OAAO,CAAC,IAAI,EAAE,MAAM;IAIpB,QAAQ,CAAC,KAAK,EAAE,MAAM;IAItB,UAAU,CAAC,OAAO,EAAE,MAAM;CAGpC"}
