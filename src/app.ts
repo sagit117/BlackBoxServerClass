@@ -97,6 +97,29 @@ export function createApp(pathToConfig: string) {
     BlackBoxServer.use(urlencodedParser);
     BlackBoxServer.use(jsonParser);
 
+    /**
+     * Установка заголовков
+     * @param _request
+     * @param response
+     * @param next
+     */
+    function setHeader(
+        _request: blackbox.Request,
+        response: blackbox.Response,
+        next: blackbox.NextFunction
+    ) {
+        const headers = config.server?.HEADERS;
+
+        if (headers && Array.isArray(headers)) {
+            headers.forEach((head) => {
+                response.setHeader(head?.key, head?.value);
+            });
+        }
+
+        next();
+    }
+    BlackBoxServer.use(setHeader);
+
     return BlackBoxServer;
 }
 

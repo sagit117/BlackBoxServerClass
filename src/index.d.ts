@@ -24,7 +24,11 @@ export namespace blackbox {
             limit: string,
             extended: boolean,
             parameterLimit: number
-        }
+        };
+        HEADERS: {
+            key: string;
+            value: string;
+        }[],
     }
 
     export interface IConfigMongo {
