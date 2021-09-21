@@ -1,6 +1,6 @@
 {
   "name": "blackboxserverclass",
-  "version": "2.0.1",
+  "version": "2.0.11",
   "description": "application for quick server creation",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",

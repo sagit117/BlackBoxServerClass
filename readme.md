@@ -2,7 +2,7 @@
 
 ### Установка
 
-> npm install blackbox_server
+> npm install blackboxserverclass
 
 ### В текущей версии поддерживаются
 #### Базы данных:
