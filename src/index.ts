@@ -57,8 +57,14 @@ BlackBox.listenedPort()
         next();
     });
 
+/**
+ * Способ создания контроллера с автопривязкой к маршруту
+ */
+
+// обязательно помечаем декоратором с общей частью пути
 @controller("/api/v1/user")
 class UserController extends BaseController {
+    // обязательно помечаем декоратором с методом запроса и оставшейся частью пути
     @GET("/get/:id")
     public getUser() {
         const { id } = this.useParams<{ id: number }>();
@@ -88,4 +94,5 @@ class RemoverController extends BaseController {
     }
 }
 
+// передаем контроллеры в приложение
 BlackBox.addControllers([UserController, RemoverController]);

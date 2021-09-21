@@ -243,6 +243,12 @@ export default class BlackBox {
         controllers.forEach((controller) => {
             const router = E.Router();
 
+            const route = routes.getRoutes(controller.name);
+
+            /**
+             * callback для роутера
+             * @param r - объект маршрута
+             */
             const cb =
                 (r: { method: string }) =>
                 (
@@ -250,14 +256,24 @@ export default class BlackBox {
                     res: blackbox.Response,
                     next: blackbox.NextFunction
                 ) => {
+                    this.log(
+                        LogEvents.LogInfo,
+                        `request method: ${req.method}, url: ${
+                            route?.path || "/"
+                        }${req.url} body: ${JSON.stringify(
+                            req.body
+                        )}, params: ${JSON.stringify(req.params)}`
+                    );
+
                     const ctl = new controller(req, res);
 
+                    /**
+                     * Соединяем маршрут с методом контроллера
+                     */
                     if (ctl[r.method]) ctl[r.method]?.();
 
                     next();
                 };
-
-            const route = routes.getRoutes(controller.name);
 
             route?.routes.forEach((r) => {
                 router[r.type](r.route, cb(r));

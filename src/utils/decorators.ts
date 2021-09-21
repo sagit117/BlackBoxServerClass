@@ -32,6 +32,22 @@ export function POST(path: string) {
     };
 }
 
+export function PUT(path: string) {
+    return function (
+        _target: any,
+        method: string,
+        descriptor: PropertyDescriptor
+    ) {
+        const originalMethod = descriptor.value;
+
+        routes.addRoute(path, method, "put");
+
+        descriptor.value = function (...args: any[]) {
+            return originalMethod.apply(this, args);
+        };
+    };
+}
+
 export function DELETE(path: string) {
     return function (
         _target: any,
